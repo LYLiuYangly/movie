@@ -15,69 +15,17 @@
   						</ul>
   					</div>
   					<div class="city_sort">
-  						<div>
-  							<h2>A</h2>
+  						<div v-for="(citys,index) in cityList">
+  							<h2 ref="scoll">{{citys.index}}</h2>
   							<ul>
-  								<li>阿拉善盟</li>
-  								<li>鞍山</li>
-  								<li>安庆</li>
-  								<li>安阳</li>
+  								<li v-for="city in citys.list" :key="city.id">{{city.nm}}</li>
   							</ul>
   						</div>
-  						<div>
-  							<h2>B</h2>
-  							<ul>
-  								<li>北京</li>
-  								<li>保定</li>
-  								<li>蚌埠</li>
-  								<li>包头</li>
-  							</ul>
-  						</div>
-  						<div>
-  							<h2>A</h2>
-  							<ul>
-  								<li>阿拉善盟</li>
-  								<li>鞍山</li>
-  								<li>安庆</li>
-  								<li>安阳</li>
-  							</ul>
-  						</div>
-  						<div>
-  							<h2>B</h2>
-  							<ul>
-  								<li>北京</li>
-  								<li>保定</li>
-  								<li>蚌埠</li>
-  								<li>包头</li>
-  							</ul>
-  						</div>
-  						<div>
-  							<h2>A</h2>
-  							<ul>
-  								<li>阿拉善盟</li>
-  								<li>鞍山</li>
-  								<li>安庆</li>
-  								<li>安阳</li>
-  							</ul>
-  						</div>
-  						<div>
-  							<h2>B</h2>
-  							<ul>
-  								<li>北京</li>
-  								<li>保定</li>
-  								<li>蚌埠</li>
-  								<li>包头</li>
-  							</ul>
-  						</div>	
   					</div>
   				</div>
   				<div class="city_index">
   					<ul>
-  						<li>A</li>
-  						<li>B</li>
-  						<li>C</li>
-  						<li>D</li>
-  						<li>E</li>
+  						<li v-for="(citys,index) in cityList" :key="citys.index"  @touchstart="handleChange(index)">{{citys.index}}</li>
   					</ul>
   				</div>
   			</div>
@@ -86,7 +34,66 @@
 
 <script>
   export default{
-    name:'city'
+    name:'city',
+    data(){
+      return{
+        cityList:[{index:'A',list:[]}],
+        hotCityList:[]
+      }
+    },
+    methods:{
+      getCityList(data){
+        //[{ index:'A',list:[ {"id":'1',"nm":'北京'},{} ]    }]        
+        for(var i=0;i<data.length;i++){
+          //获取地区首字母，转大写
+          var firstChar=data[i].py.substring(0,1).toUpperCase()
+          //校验地址数组中是否有相对应index--首字母
+          if(this.indexFirstChar(firstChar)){
+            for(var j=0;j<this.cityList.length;j++){
+              if(this.cityList[j].index===firstChar){
+                this.cityList[j].list.push(data[i])
+              }
+            }
+          }else{
+            this.cityList.push({'index':firstChar,'list':[ data[i] ] })
+          }
+        }
+       },
+      indexFirstChar(firstChar){
+        for(var j=0;j<this.cityList.length;j++){
+          if(this.cityList[j].index===firstChar){
+            return true
+          }
+        }
+        return false
+      },
+      handleChange(index){
+        console.log(this.$refs.scoll[index].offsetTop)
+        console.log(this.$refs.scoll[index].parentNode.parentNode.parentNode.scrollTop)
+        this.$refs.scoll[index].parentNode.parentNode.parentNode.scrollTop=this.$refs.scoll[index].offsetTop
+      }
+      
+    },
+    mounted(){
+      var that=this
+      this.axios({
+        url:'/dianying/cities.json',
+      }).then(res=>{
+        that.getCityList(res.data.cts)
+        //排序
+        console.log(res.data.cts)
+        that.cityList.sort((c1,c2)=>{
+          if(c1.index>c2.index){
+            return 1
+          }else if(c1.index<c2.index){
+            return -1
+          }else{
+            return 0
+          }
+        })
+        
+      })
+    }
   }
 </script>
 

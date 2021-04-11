@@ -95,3 +95,114 @@ children:[
   }
 ]
 ```
+### 反向代理配置
+vue.config.js
+```
+export default{
+  devServe:{
+    proxy:{
+      '/ajax':{
+        target:'https://m.maoyan.com',
+        changeOrigin:true
+      }
+    }
+  }
+}
+```
+### axios 
+main.js 中引入axios
+```
+Vue.prototype.axios=axios;
+
+mounted(){
+  this.axios({
+    
+  }).then(res=>{
+    
+  })
+}
+```
+### 城市数据,修改数据排列
+```
+[
+  {
+    index:'A',
+    list:[{
+      nm:'阿达',
+      id:123
+    }]
+  },
+  {
+    index:'B',
+    list:[{
+      nm:'白金',
+      id:123
+    }]
+  }
+]
+```
+遍历数据
+  根据每个数据的第一个字母 subString(0,1)
+  如果List中有，添加到已有index中
+    循环找到index===第一个字符
+```
+  array[j].list.push({nm:'nameCity',id:1341}]})
+```
+  否则新添加index
+```
+    array.push({index:newIndex,list:[{nm:'nameCity',id:1341}]});
+```  
+判断List中是否存在
+ 遍历List中每一个对象的index  === 第一个字母
+    返回 true
+ 返回false
+ 
+获取到的List 进行字母排序
+```
+array.sort(a,b)
+if(a>b)   1  升序  A,B,C
+a<b      -1
+a=b       0
+```
+### 触摸事件
+touchstart="handle(index)"
+ref获取DOM 
+parentNode.scrollTop=h2[index].offsetTop
+### 过滤器
+图片大小
+```
+Vue.filter('setWH',(url,arg)=>{
+  return url.replace(/w\.h/,arg)
+})
+```
+
+### 搜索
+watch 持续侦听 输入message的变化 ，每次变化 获取json数据
+
+### 防抖-频繁请求
+axios实现---对请求进行cancelToken设置
+```
+验证上一个请求是否结束
+~function(){
+  if(typeof that.source === 'function'){
+    //没有结束就关闭
+    that.source(that.canMsg)
+  }
+}
+axios.get('url',{
+  params:{
+    id:1
+  },
+  cancelToken: new axios.CancelToken(c=>{
+    this.source=c
+  })
+}).then(res=>{
+  
+}).catch(err=>{
+  if(axios.isCancel(err)){
+    console.log('Request canceled', err.message) //请求如果取消，返回取消的message
+  }else{
+    console.log( erre) //其他错误
+  }
+})
+```
